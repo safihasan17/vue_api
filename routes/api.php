@@ -11,14 +11,15 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\PrescriptionMedicineController;
-use App\Http\Controllers\Api\InvoiceController as ApiInvoiceController;
-use App\Http\Controllers\Api\MedicinePurchaseController as ApiMedicinePurchaseController;
-use App\Http\Controllers\Api\PaymentController as ApiPaymentController;
-use App\Http\Controllers\Api\RoleController as ApiRoleController;
-use App\Http\Controllers\Api\SupplierController as ApiSupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WardController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoiceItemController;
+use App\Http\Controllers\MedicinePurchaseController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('users', UserController::class);
     Route::apiResource('patients', PatientController::class);
-    Route::apiResource('roles', ApiRoleController::class);
+    Route::apiResource('roles', RoleController::class);
 
     Route::get('doctors/search', [DoctorController::class, 'search']);
     Route::apiResource('doctors', DoctorController::class);
@@ -69,13 +70,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('admissions', AdmissionController::class);
 
     // ---- Billing ----
-    Route::get('invoices/options', [ApiInvoiceController::class, 'options']);
-    Route::apiResource('invoices', ApiInvoiceController::class);
-    Route::post('appointments/{id}/generate-invoice', [ApiInvoiceController::class, 'fromAppointment']);
-    Route::apiResource('payments', ApiPaymentController::class);
+    Route::get('invoices/options', [InvoiceController::class, 'options']);
+    Route::apiResource('invoices', InvoiceItemController::class);
+    Route::post('appointments/{id}/generate-invoice', [InvoiceController::class, 'fromAppointment']);
+    Route::apiResource('payments', PaymentController::class);
 
     // ---- Pharmacy purchasing ----
-    Route::apiResource('suppliers', ApiSupplierController::class);
-    Route::get('medicine-purchases/options', [ApiMedicinePurchaseController::class, 'options']);
-    Route::apiResource('medicine-purchases', ApiMedicinePurchaseController::class);
+    Route::apiResource('suppliers', SupplierController::class);
+    Route::get('medicine-purchases/options', [MedicinePurchaseController::class, 'options']);
+    Route::apiResource('medicine-purchases', MedicinePurchaseController::class);
 });
