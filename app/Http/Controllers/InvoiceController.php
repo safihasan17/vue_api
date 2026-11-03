@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Invoice;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * JSON version of App\Http\Controllers\InvoiceController (the Blade one stays for web.php).
@@ -148,10 +149,29 @@ class InvoiceController extends Controller
             return response()->json(['error' => true, 'message' => 'Appointment not found'], 404);
         }
 
-        $invoice = Invoice::firstOrNew(['appointment_id' => $appointment->id]);
+        $invoice = Invoice::where('appointment_id', $appointment->id)->first();
+
+        // The same visit may already be billed inside a prescription / admission invoice
+        // (it carries the same doctor's Consultation Fee). Reuse it instead of billing the fee twice.
+        if (!$invoice && $appointment->doctor_id) {
+            $invoice = Invoice::where('patient_id', $appointment->patient_id)
+                ->where('status', '!=', 'Cancelled')
+                ->whereNull('appointment_id')
+                ->whereDate('invoice_date', Carbon::parse($appointment->appointment_date)->toDateString())
+                ->whereHas('items', fn ($q) => $q
+                    ->where('item_type', 'Consultation Fee')
+                    ->where('item_reference_id', $appointment->doctor_id))
+                ->first();
+
+            // link it to this appointment so it is found directly next time
+            $invoice?->update(['appointment_id' => $appointment->id]);
+        }
+
+        $invoice ??= new Invoice();
 
         if (!$invoice->exists) {
-            $invoice->patient_id   = $appointment->patient_id;
+            $invoice->patient_id     = $appointment->patient_id;
+            $invoice->appointment_id = $appointment->id;
             $invoice->invoice_date = $appointment->appointment_date ?? now();
             $invoice->status       = 'Unpaid';
             $invoice->total_amount = 0;

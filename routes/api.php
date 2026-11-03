@@ -71,7 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ---- Billing ----
     Route::get('invoices/options', [InvoiceController::class, 'options']);
-    Route::apiResource('invoices', InvoiceItemController::class);
+    Route::apiResource('invoices', InvoiceController::class); // was InvoiceItemController (Blade, returns views) -> that broke the API
     Route::post('appointments/{id}/generate-invoice', [InvoiceController::class, 'fromAppointment']);
     Route::apiResource('payments', PaymentController::class);
 
