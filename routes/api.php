@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BedController;
+use App\Http\Controllers\DashboardApiController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\LabTestController;
@@ -14,6 +15,9 @@ use App\Http\Controllers\PrescriptionMedicineController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WardController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\DashboardApiController as ControllersDashboardApiController;
+use App\Http\Controllers\DashboardApiController as HttpControllersDashboardApiController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceItemController;
 use App\Http\Controllers\MedicinePurchaseController;
@@ -35,6 +39,8 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
     Route::apiResource('users', UserController::class);
     Route::apiResource('patients', PatientController::class);
